@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Demo</title>
+<link rel="stylesheet" href="plugins/jsRapBar/jsRapBar.css" />
+<link rel="stylesheet" href="index.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="plugins/jsRapBar/jsRapBar.js"></script>
+<script>
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var timer = 0;
+var audioCtx = new AudioContext();
+var oscillator = audioCtx.createOscillator();
+var gainNode = audioCtx.createGain();
+oscillator.connect(gainNode);
+oscillator.start(0);  
+  
+function ChangeBar(b,v){
+var curv = Math.pow(1000 * v,2);
+var maxv = Math.pow(1000,2);
+var v = curv /maxv;
+var hz = Math.floor(v * 20000);
+$('#input' + b).val(hz);
+setFrequency();
+}
+  
+function setFrequency(){
+var f1 = $('#input1').val();
+var f2 = $('#input2').val();
+var p = +$('input[name=play]:checked').val();
+var type = $('input[name=shape]:checked').val();
+if(oscillator.type != type)
+	oscillator.type = type;
+switch(p){
+case 0:
+	timer = 0;
+	clearInterval(timer);
+	gainNode.disconnect();
+	break;
+case 1:
+	timer = 0;
+	clearInterval(timer);
+	oscillator.frequency.value = f1;
+	gainNode.connect(audioCtx.destination);
+	break;
+case 2:
+	timer = 0;
+	clearInterval(timer);
+	oscillator.frequency.value = f2;
+	gainNode.connect(audioCtx.destination);
+	break;
+case 3:
+	var r = Math.random();
+	var f = f1 * r + f2 * (1 - r);
+	oscillator.frequency.value = f;
+	gainNode.connect(audioCtx.destination);
+	if(!timer)
+		timer = setInterval(function(){
+			setFrequency();
+		},1000);
+	break;
+}
+}
+
+$(document).ready(function(){
+$('#bar1').jsRapBar({position:0.1,
+onChange:function(value){
+	ChangeBar(1,value);
+}
+});
+$('#bar2').jsRapBar({position:0.1,
+onChange:function(value){
+	ChangeBar(2,value);
+}
+});
+$('#barVolume').jsRapBar({position:1,
+onChange:function(value){
+	gainNode.gain.value = value;
+}
+});
+ChangeBar(1,0.1);
+ChangeBar(2,0.1);
+});
+</script>
+</head>
+<body>
+<div id="divMain">
+<div id="divGitHub">
+<div id="GitHub" onclick="window.open('https://github.com/Thibor/jsRapOscillator', '_blank')"></div>
+</div>
+<input id='input1' />Hz
+<div id="bar1"></div>
+<input id='input2' />Hz
+<div id="bar2"></div>
+Volume
+<div id="barVolume"></div>
+<fieldset>
+<legend>Shape</legend>
+<label><input type="radio" name="shape" value="sine" onclick="setFrequency()" checked />Sine</label>
+<label><input type="radio" name="shape" value="triangle" onclick="setFrequency()" />Triangle</label>
+<label><input type="radio" name="shape" value="square" onclick="setFrequency()" />Square</label>
+<label><input type="radio" name="shape" value="sawtooth" onclick="setFrequency()" />Sawtooth</label>
+</fieldset>
+<fieldset>
+<legend>Play</legend>
+<label><input type="radio" name="play" value="0" onclick="setFrequency()" checked />Off</label>
+<label><input type="radio" name="play" value="1" onclick="setFrequency()" />Frequency 1</label>
+<label><input type="radio" name="play" value="2" onclick="setFrequency()" />Frequency 2</label>
+<label><input type="radio" name="play" value="3" onclick="setFrequency()" />Between</label>
+</fieldset>
+</div>
+</body>
+</html>
