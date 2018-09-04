@@ -67,19 +67,19 @@ gainNode.gain.value = v;
 
 $(document).ready(function(){
 ChangeBar(1,0.1);
-ChangeBar(2,0.1);
+ChangeBar(2,0.2);
 });
 </script>
 </head>
 <body>
 <div id="divMain">
 <div id="divGitHub">
-<div id="GitHub" onclick="window.open('https://github.com/Thibor/RapOscillator', '_blank')"></div>
+<div id="GitHub" onclick="location.href='https://github.com/Thibor/RapOscillator'"></div>
 </div>
 Frequency 1<input id='input1' />Hz
 <input type="range" min="0" max="1" value="0.1" step="0.0001" oninput="ChangeBar(1,this.value)">
 Frequency 2<input id='input2' />Hz
-<input type="range" min="0" max="1" value="0.1" step="0.0001" oninput="ChangeBar(2,this.value)">
+<input type="range" min="0" max="1" value="0.2" step="0.0001" oninput="ChangeBar(2,this.value)">
 Volume
 <div id="barVolume"></div>
  <input type="range" min="0" max="1" value="1" step="0.0001" oninput="SetVolume(this.value)">
