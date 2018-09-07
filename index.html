@@ -51,7 +51,7 @@ case 2:
 case 3:
 	var r = Math.random();
 	var f = f1 * r + f2 * (1 - r);
-	oscillator.frequency.value = f;
+	oscillator.frequency.setTargetAtTime(f,audioCtx.currentTime,1);
 	gainNode.connect(audioCtx.destination);
 	if(!timer)
 		timer = setInterval(function(){
