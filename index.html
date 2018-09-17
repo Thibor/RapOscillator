@@ -7,56 +7,51 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
-var timer = 0;
-var audioCtx = new AudioContext();
-var oscillator = audioCtx.createOscillator();
-var gainNode = audioCtx.createGain();
+let frequency = 0;
+let timer = 0;
+let audioCtx = new AudioContext();
+let oscillator = audioCtx.createOscillator();
+let gainNode = audioCtx.createGain();
 oscillator.connect(gainNode);
-oscillator.start(0);  
+oscillator.start();  
   
-function ChangeBar(b,v){
-var curv = Math.pow(1000 * v,2);
-var maxv = Math.pow(1000,2);
-var v = curv /maxv;
-var hz = Math.floor(v * 20000);
+function ChangeBar(b){
+let v =  $('#frequency' + b).val();
+let curv = Math.pow(1000 * v,2);
+let maxv = Math.pow(1000,2);
+let hz = Math.floor((curv / maxv) * 20000);
 $('#input' + b).val(hz);
 SetFrequency();
 }
   
 function SetFrequency(){
-var f1 = $('#input1').val();
-var f2 = $('#input2').val();
-var p = +$('input[name=play]:checked').val();
-var type = $('input[name=shape]:checked').val();
+let f1 = $('#input1').val();
+let f2 = $('#input2').val();
+let p = +$('input[name=play]:checked').val();
+let type = $('input[name=shape]:checked').val();
 if(oscillator.type != type)
 	oscillator.type = type;
+clearTimeout(timer);	
 switch(p){
 case 0:
-	timer = 0;
-	clearInterval(timer);
 	gainNode.disconnect();
 	break;
 case 1:
-	timer = 0;
-	clearInterval(timer);
-	oscillator.frequency.value = f1;
+	oscillator.frequency.setTargetAtTime(f1,audioCtx.currentTime,0);
 	gainNode.connect(audioCtx.destination);
 	break;
 case 2:
-	timer = 0;
-	clearInterval(timer);
-	oscillator.frequency.value = f2;
+	oscillator.frequency.setTargetAtTime(f2,audioCtx.currentTime,0);
 	gainNode.connect(audioCtx.destination);
 	break;
 case 3:
-	var r = Math.random();
-	var f = f1 * r + f2 * (1 - r);
-	oscillator.frequency.setTargetAtTime(f,audioCtx.currentTime,1);
+	frequency = frequency == f1 ? f2 : f1;
+	let b = $('#between').val() * 15000;
+	oscillator.frequency.setTargetAtTime(frequency,audioCtx.currentTime,b / 1000);
 	gainNode.connect(audioCtx.destination);
-	if(!timer)
-		timer = setInterval(function(){
+	timer = setTimeout(function(){
 			SetFrequency();
-		},1000);
+		},b);
 	break;
 }
 }
@@ -66,8 +61,8 @@ gainNode.gain.value = v;
 }
 
 $(document).ready(function(){
-ChangeBar(1,0.1);
-ChangeBar(2,0.2);
+ChangeBar(1);
+ChangeBar(2);
 });
 </script>
 </head>
@@ -77,9 +72,11 @@ ChangeBar(2,0.2);
 <div id="GitHub" onclick="location.href='https://github.com/Thibor/RapOscillator'"></div>
 </div>
 Frequency 1<input id='input1' />Hz
-<input type="range" min="0" max="1" value="0.1" step="0.0001" oninput="ChangeBar(1,this.value)">
+<input type="range" id="frequency1" min="0" max="1" value="0.1" step="0.0001" oninput="ChangeBar(1)">
 Frequency 2<input id='input2' />Hz
-<input type="range" min="0" max="1" value="0.2" step="0.0001" oninput="ChangeBar(2,this.value)">
+<input type="range" id="frequency2" min="0" max="1" value="0.2" step="0.0001" oninput="ChangeBar(2)">
+Between
+<input type="range" id="between" min="0" max="1" value="0.1" step="0.0001" oninput="SetFrequency()">
 Volume
 <div id="barVolume"></div>
  <input type="range" min="0" max="1" value="1" step="0.0001" oninput="SetVolume(this.value)">
