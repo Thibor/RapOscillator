@@ -25,6 +25,7 @@ SetFrequency();
 }
   
 function SetFrequency(){
+audioCtx.resume();
 let f1 = $('#input1').val();
 let f2 = $('#input2').val();
 let p = +$('input[name=play]:checked').val();
@@ -50,8 +51,8 @@ case 3:
 	oscillator.frequency.setTargetAtTime(frequency,audioCtx.currentTime,b / 1000);
 	gainNode.connect(audioCtx.destination);
 	timer = setTimeout(function(){
-			SetFrequency();
-		},b);
+		SetFrequency();
+	},b);
 	break;
 }
 }
